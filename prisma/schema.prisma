@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  first_name String
+  last_name  String
+  timezone   String
+  Message    Message[]
+  Event      Event[]
+}
+
+model Message {
+  id            Int       @id @default(autoincrement())
+  user_id       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  event_id      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId       Int
+  event_type_id EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  eventTypeId   Int
+  status        String
+  sent_time     DateTime? @default(now())
+  created_at    DateTime  @default(now())
+}
+
+model EventType {
+  id       Int       @id @default(autoincrement())
+  name     String
+  greeting String
+  Event    Event[]
+  Message  Message[]
+}
+
+model Event {
+  id            Int       @id @default(autoincrement())
+  date          String
+  user_id       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  event_type_id EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  eventTypeId   Int
+  Message       Message[]
+}
